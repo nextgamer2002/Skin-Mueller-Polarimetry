@@ -1,0 +1,395 @@
+limits_greenrmin=320;% limits green row min
+limits_greenrmax=340;%limits green row max   (rowmin:rowmax,columnmin:columnmax)
+limits_greencmin=80;
+limits_greencmax=100;
+limits_redrmin=400;
+limits_redrmax=420;
+limits_redcmin=290;
+limits_redcmax=310;
+
+
+for i=1:1:512
+for j=1:1:512
+MI(i,j)=M00(i,j);
+M00(i,j)=M00(i,j)./MI(i,j);
+M01(i,j)=M01(i,j)./MI(i,j);
+M02(i,j)=M02(i,j)./MI(i,j);
+M03(i,j)=M03(i,j)./MI(i,j);
+M10(i,j)=M10(i,j)./MI(i,j);
+M11(i,j)=M11(i,j)./MI(i,j);
+M12(i,j)=M12(i,j)./MI(i,j);
+M13(i,j)=M13(i,j)./MI(i,j);
+M20(i,j)=M20(i,j)./MI(i,j);
+M21(i,j)=M21(i,j)./MI(i,j);
+M22(i,j)=M22(i,j)./MI(i,j);
+M23(i,j)=M23(i,j)./MI(i,j);
+M30(i,j)=M30(i,j)./MI(i,j);
+M31(i,j)=M31(i,j)./MI(i,j);
+M32(i,j)=M32(i,j)./MI(i,j);
+M33(i,j)=M33(i,j)./MI(i,j);
+
+Mueller=[M00(i,j),M01(i,j),M02(i,j),M03(i,j);M10(i,j),M11(i,j),M12(i,j),M13(i,j);M20(i,j),M21(i,j),M22(i,j),M23(i,j);M30(i,j),M31(i,j),M32(i,j),M33(i,j)]./(M00(i,j));
+norm_Mueller = M00(i,j);
+Mueller=Mueller/norm_Mueller;
+
+%%parameters extracted from MMT
+t(i,j)=(sqrt(M31(i,j)^2+M23(i,j)^2))/2;
+x(i,j)=atand(M31(i,j)/M23(i,j))/2;
+%
+ddelta(i,j)=sqrt(M13(i,j)^2+M23(i,j)^2+M31(i,j)^2+M32(i,j)^2);
+
+%%Chipman decomposition
+D = [M01(i,j),M02(i,j),M03(i,j)];
+Dlin(i,j)=D(1,1);
+Dlinprima(i,j)=D(1,2);
+Dcirc(i,j)=D(1,3);
+Dabs(i,j)=norm(D);
+Diatt=norm(D);
+P=[M10(i,j),M20(i,j),M30(i,j)];
+
+
+scl =(M00(i,j)^2)+(M01(i,j)^2)+(M02(i,j)^2)+(M03(i,j)^2)+(M10(i,j)^2)+(M11(i,j)^2)+(M12(i,j)^2)+(M13(i,j)^2)+(M20(i,j)^2)+(M21(i,j)^2)+(M22(i,j)^2)+(M23(i,j)^2)+(M30(i,j)^2)+(M31(i,j)^2)+(M32(i,j)^2)+(M33(i,j)^2);
+PDcl=real(sqrt((((scl))-(1))/(3)));
+
+Polar=norm(P);
+Pol(i,j)=Polar;
+Pnorm=P/Polar;
+%Pp(i,j)=sqrt((Diatt^2+Polar^2)/2); No m'interessara quantificar Pp de un
+%sistema que he classificat com no pur despolaritzant (i.e P3 proper a 0)
+%i.e. PD no prou proper a 1
+I=eye(3);
+md=sqrt(1-(Diatt)^2)*I+(1-sqrt(1-(Diatt)^2))*(D'/Diatt)*(D/Diatt);
+MD=[1 D; D' md];
+MMd_1 = Mueller / MD;
+
+ mp = MMd_1(2:4, 2:4);
+ 
+ d = det(mp);
+ ds = sign(d);
+ 
+ mpmpt = mp*mp';
+ try
+     e = eig(mpmpt);
+ catch
+     disp('singular matrix\n');
+     return;
+ end
+ L = sqrt(real(e));
+ k1 = L(1)+L(2)+L(3);
+ k2 = L(1)*L(2) + L(2)*L(3) + L(3)*L(1);
+ k3 = L(1)*L(2)*L(3);
+ 
+ mpmptmp = mpmpt * mp;
+ mpmptmpk2mp = mpmptmp + k2 * mp;
+ 
+ Id3 = eye(3,3);
+ 
+ k1mpmptk3I = k1*mpmpt + k3*Id3;
+ 
+ mD = (mpmpt + k2*Id3) \ k1mpmptk3I * ds;
+ 
+ Dep = MMd_1;
+ Dep(2:4, 2:4) = mD;
+ 
+ Dep = real(Dep);
+ Dep(abs(Dep) > 2) = 0;% matriu de depolarització segons Chipman
+
+ DeltaChip(i,j)=abs(trace(Dep)-1)/3;
+ mr = k1mpmptk3I \ mpmptmpk2mp;
+ MR(2:4, 2:4) = mr;
+ MR(1,1) = 1;
+ 
+ MR = real(MR);
+ MR(abs(MR) > 2) = 0;
+ Retgrau(i,j)=real((acosd((trace(MR)/2)-1)));% al ser menor a -1 dona la part real 180 i la part imaginaria varia
+
+
+        
+        if Retgrau(i,j)~=180 && Retgrau(i,j)~=0
+        ur=(1/(2*sind(Retgrau(i,j))))*[mr(2,3)-mr(3,2);mr(3,1)-mr(1,3);mr(1,2)-mr(2,1)];
+      
+        norma=norm(ur);
+       
+       
+        urnorm=ur/norma;
+       
+        
+        Rvec=real(Retgrau(i,j)*urnorm);
+       % per la magnitud diria que no es multiplica per el retard
+        end
+        if round(Retgrau(i,j))==0 || round(Retgrau(i,j))==180
+        Rvec=[0;0;0];
+        end
+        RLin(i,j)=Rvec(1,1);
+        RLinprima(i,j)=Rvec(2,1);
+        RL(i,j)=real(sqrt(Rvec(1,1)^2+Rvec(2,1)^2));
+        RC(i,j)=real(Rvec(3,1)); 
+        if norm(Rvec)~=0 
+        fastax(i,j)=0.5*atand(Rvec(2,1)/Rvec(1,1)); % la funcio atan esta definida entre -90 i 90. 
+        else
+        fastax(i,j)=0;
+        end
+        Rnorm(i,j)=sqrt(RL(i,j)^2+RC(i,j)^2);
+        LR(i,j)=real(acosd(sqrt((MR(2,2)+MR(3,3))^2+(MR(3,2)+MR(2,3))^2)-1));%value delta lineal retardance asociated to fastaxis
+        upOR=((MR(3,2)-MR(2,3)));
+        dwOR=((MR(2,2)+MR(3,3)));
+      
+        OR(i,j)=real(atand(upOR/dwOR));%optical rotation, i.e circular retardance contribution
+        
+  
+end
+end
+RetChipgreen=abs(Retgrau(limits_greenrmin:limits_greenrmax,limits_greencmin:limits_greencmax)/180-1);
+disp(["Chipman g norm",mean(RetChipgreen(:))]);
+disp(["Chipman g std",std(RetChipgreen(:))]);
+
+RetChipred=abs(Retgrau(limits_redrmin:limits_redrmax,limits_redcmin:limits_redcmax)/180-1);
+disp(["Chipman r norm",mean(RetChipred(:))]);
+disp(["Chipman r std",std(RetChipred(:))]);
+
+%%t
+tred=t(limits_redrmin:limits_redrmax,limits_redcmin:limits_redcmax);
+disp(["t red",mean(tred(:))]);
+disp(["t red std",std(tred(:))]);
+tgreen=t(limits_greenrmin:limits_greenrmax,limits_greencmin:limits_greencmax);
+disp(["t green",mean(tgreen(:))]);
+disp(["t green std",std(tgreen(:))]);
+
+Retnorm=abs(Retgrau/180-1);
+
+figure(19)
+imagesc(abs(Retgrau/180-1));title("RChipman normalized (/180)");colormap("jet")
+colorbar;
+figure(20)
+% Crear una máscara para los valores diferentes de 0
+mask_non_zero = fastax ~= 0;  % True donde los valores son diferentes de 0
+
+% Crear una nueva lista de ángulos donde los valores 0 son NaN
+fastax_with_gray = fastax;  % Copiar la lista original
+fastax_with_gray(~mask_non_zero) = 0;  % Reemplazar los valores 0 por 0 (esto es lo que se visualizará como gris)
+
+% Usar imagesc para mostrar los valores con ceros en gris
+imagesc(fastax_with_gray); 
+colorbar;  % Agregar la barra de color
+%clim([min(fastax(:)), max(fastax(:))])
+title('\theta_{OA}(\lambda=554 nm)');
+
+
+% Ajustar el colormap
+colormap([0.5 0.5 0.5; jet(256)]);  % Gris (0.5, 0.5, 0.5) para ceros y jet para los demás valores  % Asegurarse de que el rango de colores va de 0 a 360 grados
+
+colorbar;
+
+
+
+figure(22)
+histogram(fastax,180)
+
+
+figure(21)
+Cos=cosd(fastax);
+Sin=sind(fastax);
+fila1=512:-1:1;
+U=repmat(fila1,512,1);
+Y=U';
+xreal=1:1:512;
+Xre=repmat(xreal,512,1);
+hold on;
+bk=find(Sin<1.0 & Sin>=0.707107);
+quiver(Xre(bk),Y(bk),Cos(bk),Sin(bk),'AutoScale', 'off', 'AutoScaleFactor', 0.2,'color','y')
+quiver(Xre(bk),Y(bk),-Cos(bk),-Sin(bk),'AutoScale', 'off', 'AutoScaleFactor', 0.2,'color','y')% de 45 a 90 graus
+bk=find(Sin<0.707107 & Sin>=0.0);
+quiver(Xre(bk),Y(bk),Cos(bk),Sin(bk),'AutoScale', 'off', 'AutoScaleFactor', 0.2,'color',"r")
+quiver(Xre(bk),Y(bk),-Cos(bk),-Sin(bk),'AutoScale', 'off', 'AutoScaleFactor', 0.2,'color',"r")% de 0 a 45 graus
+bk=find(Sin<0.0 & Sin>=-0.707107);
+quiver(Xre(bk),Y(bk),Cos(bk),Sin(bk),'AutoScale', 'off', 'AutoScaleFactor', 0.2,'color','b')% de 0 a -45 graus
+quiver(Xre(bk),Y(bk),-Cos(bk),-Sin(bk),'AutoScale', 'off', 'AutoScaleFactor', 0.2,'color','b')% de 0 a -45 graus
+bk=find(Sin<-0.707107 & Sin>=-1.0);
+quiver(Xre(bk),Y(bk),Cos(bk),Sin(bk),'AutoScale', 'off', 'AutoScaleFactor', 0.2,'color','m')% de -45 a -90 graus
+quiver(Xre(bk),Y(bk),-Cos(bk),-Sin(bk),'AutoScale', 'off', 'AutoScaleFactor', 0.2,'color','m')
+axis("equal");
+hold off;
+
+figure;
+histogram(Retgrau);
+title("Ret Chipman histogram")
+
+
+
+figure;
+imagesc((RC));title("Magnitud de retard circular");colormap("hot")
+
+colorbar;
+
+figure;
+imagesc(RL);title("Magnitud de retard lineal (45+h/v)");colormap("hot")
+
+colorbar;
+
+%figure;
+%imagesc(RLinprima);title("Magnitud de retard 45");colormap("hot")
+%colorbar;
+
+figure;
+imagesc(RLin);title("Magnitud de retard h/v");colormap("hot")
+colorbar;
+
+figure;
+imagesc(abs(Dlin));title("Magnitud de diatenuacio h/v");colormap("hot")
+colorbar;
+
+figure;
+imagesc(abs(Dlinprima));title("Magnitud de diatenuacio 45");colormap("hot")
+colorbar;
+
+figure;
+imagesc(abs(Dcirc));title("Magnitud de diatenuacio circular");colormap("hot")
+colorbar;
+
+figure;
+imagesc(abs(Dabs));title("Magnitud de diatenuacio global");colormap("hot")
+colorbar;
+clim([0 1]);
+
+
+radius = 1;  % Radius of the sphere
+
+
+% Plot the points on the sphere
+figure;
+plot3(RLin, RLinprima, RC, 'ro', 'MarkerFaceColor', 'r');
+
+% Add labels and title
+xlabel('Lineal');
+ylabel('45');
+zlabel('Circular');
+title('Poincare de anisotropia Retard');
+grid on;
+axis equal;
+
+% Plot the orthogonal axes
+% X-axis (Red line)
+hold on;
+plot3([-radius radius], [0 0], [0 0], 'black', 'LineWidth', 1);
+
+% Y-axis (Green line)
+plot3([0 0], [-radius radius], [0 0], 'black', 'LineWidth', 1);
+
+% Z-axis (Blue line)
+plot3([0 0], [0 0], [-radius radius], 'black', 'LineWidth', 1);
+
+
+
+figure;
+plot3(Dlin, Dlinprima, Dcirc, 'bo', 'MarkerFaceColor', 'r');
+
+% Add labels and title
+xlabel('Lineal');
+ylabel('45');
+zlabel('Circular');
+title('Poincare de anisotropia Diattenuació');
+grid on;
+axis equal;
+
+% Plot the orthogonal axes
+% X-axis (Red line)
+hold on;
+plot3([-radius radius], [0 0], [0 0], 'black', 'LineWidth', 1);
+
+% Y-axis (Green line)
+plot3([0 0], [-radius radius], [0 0], 'black', 'LineWidth', 1);
+
+% Z-axis (Blue line)
+plot3([0 0], [0 0], [-radius radius], 'black', 'LineWidth', 1);
+
+
+
+figure(31)
+imagesc(OR);title("Optical rotation (CR)");colormap("hot")
+colorbar;
+
+figure(32)
+imagesc(LR);title("Lineal Rotatation (LR) ");colormap("hot")
+colorbar;
+figure(40)
+scatter3(Pol,Dabs,Retgrau, 10, 'r', 'filled');
+axis equal;
+xlabel('P');
+ylabel('D');
+zlabel('Retard Chip');
+title('CPs space');
+
+
+%disp(["RetChipg",mean(Retgraug(:))]);
+%disp(["RetChipg std",std(Retgraug(:))]);
+%disp(["RetChipred",mean(Retgraur(:))]);
+%disp(["RetChipred std",std(Retgraur(:))]);
+disp(["Retard Chipman global mean",mean(Retgrau(:))]);
+disp(["Retard Chipman global std",std(Retgrau(:))]);
+
+disp(["Delta Chipman global mean",mean(DeltaChip(:))]);
+disp(["Delta Chipman global std",std(DeltaChip(:))]);
+
+disp(["t mean",mean(t(:))]);
+
+
+
+
+
+
+figure;
+imagesc(DeltaChip);
+title("Delta Chipman");
+colormap("gray");
+colorbar;
+clim([0 1]);
+
+figure;
+imagesc(abs(t));
+title("|t|(\lambda=554 nm)");
+colormap("jet");
+colorbar;
+
+figure;
+imagesc(x);
+colormap("jet");
+title("fastax segons MMT");
+colorbar;
+
+%Save created variables
+%fileName9 = 't_470_huellaivan.mat';
+%fileName10="Chip_470_munecapol.mat";
+%fileName11="RetChip_IR_manoivan.mat";
+
+%desktopPath = fullfile(getenv('USERPROFILE'), 'Desktop', 'comparativazonasivan');  
+% Ruta completa al archivo
+%filePath9 = fullfile(desktopPath, fileName9);
+%filePath10 = fullfile(desktopPath, fileName10);
+%filePath11 = fullfile(desktopPath, fileName11);
+
+% Guardar la matriz A en el archivo .mat
+%save(filePath9, 't');
+%save(filePath10, 'Retnorm');
+%save(filePath11, 'Retgrau');
+disp(["mean value t MMT is",mean(t(:))]);
+figure;
+imagesc(ddelta);
+colorbar;
+title("ddelta")
+disp(["mean de abs(Chipman/180-1)",abs(mean(Retgrau(:))/180-1)]);
+
+figure(40)
+scatter3(Pred1,Dred1,tred, 15, 'r', 'filled');
+hold on;
+scatter3(Pgreen1,Dgreen1,tgreen, 15, 'green', 'filled');
+axis equal;
+xlabel('P');
+ylabel('D');
+zlabel('t');
+title('CPs space with t');
+ax = gca;
+
+% Cambiar el grosor de los límites (ejes)
+ax.LineWidth = 1.5; 
+grid on;
+hold off;
