@@ -1,0 +1,52 @@
+Pd1=1;
+Pd2=1;
+Pd3=1;
+datos_estandarizados = [
+    0.1058 0.064 0.068 0.19717 0.11619 0.0612 0.0224
+    0.2919 0.1414 0.1432 0.4365 0.301 0.2416 0.0255
+    0.2414 0.1302 0.1055 0.3464 0.259 0.2067 0.02068;
+   
+];%les files son mostres i cada columna es una propietat optica mesurada
+%datos_estandarizados = zscore(datos);
+[coef, score, latent, tsquared, explained] = pca(datos_estandarizados);
+
+figure;
+scatter(score(:,1),score(:,2), 100, 'filled');
+hold on; 
+scatter(score(1,1),score(1,2),100,"blue","filled");
+scatter(score(2,1),score(2,2),100,"blue","filled");
+scatter(score(3,1),score(3,2),100,"blue","filled");
+
+title('Proyecciones de las Muestras en el Espacio de los Componentes Principales');
+xlabel('Componente Principal 1');
+ylabel('Componente Principal 2');
+disp(score)
+
+% Añadir etiquetas para cada muestra
+text(score(1,1),score(1,2), 'huella', 'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'right');
+text(score(2,1),score(2,2), 'antebrazo', 'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'right');
+text(score(3,1),score(3,2), 'mano', 'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'right');
+
+
+
+%Calcular el porcentaje de contribución de cada propiedad en cada componente
+% 'coef' tiene el número de propiedades en las filas y el número de componentes en las columnas
+contribuciones = abs(coef);  % Tomar los valores absolutos de los coeficientes
+
+% Normalizar para obtener los porcentajes
+porcentaje_contribucion = contribuciones ./ sum(contribuciones, 1) * 100;  % Calculamos el porcentaje
+
+% Mostrar el porcentaje de contribución de cada propiedad en cada componente
+figure;
+bar(porcentaje_contribucion');
+title('Porcentaje de Contribución de Cada Propiedad en Cada Componente Principal');
+xlabel('Componente Principal');
+ylabel('Porcentaje de Contribución (%)');
+legend({'PD', 'P', 'D', 'P3', 'P2', 'P1', 't'}, 'Location', 'Best');
+disp('Varianza explicada por cada componente:');
+disp(explained);
+figure;
+pareto(explained);
+xlabel('Componentes Principales');
+ylabel('Porcentaje de Varianza Explicada');
+title('Varianza Explicada Acumulada por los Componentes Principales');
