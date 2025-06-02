@@ -1,5 +1,8 @@
 # Skin-Mueller-Polarimetry
 Repository of the MATLAB code generated for skin optical properties and plots generated in TFG Physics
+
+
+
 In CODE #1, the IPPS space parameters are given for two selected zones: red and green ( which in the original TFG code corresponded to damaged (tattooed) and normal skin, respectively). MATLAB code also generates the IPPS tethraedrical space with all the selected values in red and green regions of P1,P2 and P3 associated parameters. This code also gives a Pseudocolored map (Pseudocolor map #1 named in the thesis) based on the characteristic decomposition of IPPs.
 
 CODE #2 returns values of all the direct optical parameters: Index of depolarization (PD), polarizance (P), diattenuation (D) and creates an imagesc colormap of values.
