@@ -1,0 +1,306 @@
+%change limits depending on interest zone
+limits_greenrmin=320;% limits green row min
+limits_greenrmax=340;%limits green row max   (rowmin:rowmax,columnmin:columnmax)
+limits_greencmin=30;
+limits_greencmax=50;
+limits_redrmin=450;
+limits_redrmax=470;
+limits_redcmin=80;
+limits_redcmax=100;
+
+
+
+for i=1:1:512
+    for j=1:1:512
+
+MI(i,j)=M00(i,j);
+M00(i,j)=M00(i,j)./MI(i,j);
+M01(i,j)=M01(i,j)./MI(i,j);
+M02(i,j)=M02(i,j)./MI(i,j);
+M03(i,j)=M03(i,j)./MI(i,j);
+M10(i,j)=M10(i,j)./MI(i,j);
+M11(i,j)=M11(i,j)./MI(i,j);
+M12(i,j)=M12(i,j)./MI(i,j);
+M13(i,j)=M13(i,j)./MI(i,j);
+M20(i,j)=M20(i,j)./MI(i,j);
+M21(i,j)=M21(i,j)./MI(i,j);
+M22(i,j)=M22(i,j)./MI(i,j);
+M23(i,j)=M23(i,j)./MI(i,j);
+M30(i,j)=M30(i,j)./MI(i,j);
+M31(i,j)=M31(i,j)./MI(i,j);
+M32(i,j)=M32(i,j)./MI(i,j);
+M33(i,j)=M33(i,j)./MI(i,j);
+
+Mueller=[M00(i,j),M01(i,j),M02(i,j),M03(i,j);M10(i,j),M11(i,j),M12(i,j),M13(i,j);M20(i,j),M21(i,j),M22(i,j),M23(i,j);M30(i,j),M31(i,j),M32(i,j),M33(i,j)]./(M00(i,j));
+norm_Mueller = M00(i,j);
+Mueller=Mueller/norm_Mueller;
+
+%%%%%%%%%%%%%% Parametros Polarimetricos 
+
+%%%%Diattenuation 
+D(i,j)=sqrt((M01(i,j)^2)+(M02(i,j)^2)+(M03(i,j)^2));
+
+DAz(i,j)= (1/2)*(atan2(M02(i,j),M01(i,j)));
+if DAz(i,j)==0
+    if M01(i,j)>0
+        DAz(i,j)=0;
+    end
+    if M01(i,j)<0
+       DAz(i,j)=pi/2;
+    end
+    
+end   
+%%%%%% retard amb formula Gil
+c=((M01(i,j))^2+(M02(i,j))^2+(M03(i,j))^2);
+a=sqrt(1-(c));
+b=(1-(sqrt(1-(c))))/(c);
+if any(isnan(b),"all")
+    b=0;
+end
+Ret(i,j)=real((180/pi)*acos((1/(2*a))*(M11(i,j)+M22(i,j)+M33(i,j)-(b*((M12(i,j)*M01(i,j))+(M20(i,j)*M02(i,j))+(M30(i,j)*M03(i,j))))-a)));
+ddelta(i,j)=sqrt(M13(i,j)^2+M23(i,j)^2+M31(i,j)^2+M32(i,j)^2);
+
+
+
+
+
+V(i,j)=abs(M01(i,j));
+Q(i,j)=abs(M02(i,j));
+C(i,j)=abs(M03(i,j));
+%%%LDiagonal elements
+    g=sqrt(3);
+    Refl(i,j)=(sqrt((M33(i,j)^2)+(M11(i,j)^2)+(M22(i,j)^2)))./g;
+%%%Depolarization index
+s =(M00(i,j)^2)+(M01(i,j)^2)+(M02(i,j)^2)+(M03(i,j)^2)+(M10(i,j)^2)+(M11(i,j)^2)+(M12(i,j)^2)+(M13(i,j)^2)+(M20(i,j)^2)+(M21(i,j)^2)+(M22(i,j)^2)+(M23(i,j)^2)+(M30(i,j)^2)+(M31(i,j)^2)+(M32(i,j)^2)+(M33(i,j)^2);
+PD(i,j)=real(sqrt((((s))-(1))/(3)));
+%%%Polarizancia
+    P(i,j)=sqrt((M10(i,j)^2)+(M20(i,j)^2)+(M30(i,j)^2));
+    pq(i,j)=abs(M20(i,j));
+
+   
+    end
+
+    end
+        
+
+   
+Intensidad=Int1(1:2:1024,1:2:1024)+Int1(2:2:1024,2:2:1024);
+Intensidad=Intensidad./(max(max(Intensidad)));
+
+
+figure(1)
+imagesc(Intensidad);title("Intensidad");colormap("gray");
+colorbar;
+
+
+colorbar;
+
+figure(2)
+Dnorm=D;
+imagesc(Dnorm);title("Diattenuation");colormap("gray");
+colorbar
+figure(3)
+Deg=DAz*180/pi;
+imagesc(Deg);colormap("hot");
+colorbar
+
+figure(4)
+imagesc(Refl/max(Refl(:)));title("Diagonal elements");colormap("gray");
+colorbar
+figure(5)
+imagesc(PD);title("Depolarization index");colormap("gray");
+clim([0 0.8])
+
+
+
+colorbar
+figure(6)
+imagesc(P);title("Polarizancia");colormap("gray");
+colorbar
+figure(10)
+imagesc(pq);title("Polarizancia lin");colormap("gray");
+colorbar;
+figure;
+histogram(Deg,180);
+xlim([-90,90]);
+figure;
+Cos=cosd(Deg);
+Sin=sind(Deg);
+fila1=700:-1:1;
+U=repmat(fila1,700,1);
+Y=U';
+xreal=1:1:700;
+Xre=repmat(xreal,700,1);
+hold on;
+bk=find(Sin<1.0 & Sin>=0.707107);
+quiver(Xre(bk),Y(bk),Cos(bk),Sin(bk),'AutoScale', 'off', 'AutoScaleFactor', 0.2,'color','r')
+quiver(Xre(bk),Y(bk),-Cos(bk),-Sin(bk),'AutoScale', 'off', 'AutoScaleFactor', 0.2,'color','r') % de 45 a 90 graus + segona linea per flecha doble ( ambiguedad acoseno)                                                                                              % de 45 a 90 graus
+bk=find(Sin<0.707107 & Sin>=0.0);
+quiver(Xre(bk),Y(bk),Cos(bk),Sin(bk),'AutoScale', 'off', 'AutoScaleFactor', 0.2,'color',"y")% de 0 a 45 graus
+quiver(Xre(bk),Y(bk),-Cos(bk),-Sin(bk),'AutoScale', 'off', 'AutoScaleFactor', 0.2,'color',"y")
+bk=find(Sin<0.0 & Sin>=-0.707107);
+quiver(Xre(bk),Y(bk),Cos(bk),Sin(bk),'AutoScale', 'off', 'AutoScaleFactor', 0.2,'color','b')% de 0 a -45 graus
+quiver(Xre(bk),Y(bk),-Cos(bk),-Sin(bk),'AutoScale', 'off', 'AutoScaleFactor', 0.2,'color','b')
+bk=find(Sin<-0.707107 & Sin>=-1.0);
+quiver(Xre(bk),Y(bk),Cos(bk),Sin(bk),'AutoScale', 'off', 'AutoScaleFactor', 0.2,'color','m')% de -45 a -90 graus
+quiver(Xre(bk),Y(bk),-Cos(bk),-Sin(bk),'AutoScale', 'off', 'AutoScaleFactor', 0.2,'color','m')
+hold off;
+
+
+
+figure(88); % Retard amb la formula tfg gerard
+imagesc(Ret);
+colorbar;
+title("mapa retard segons formula llarga")
+
+%%Analysis of green red
+%Retard formula gerard
+
+%green
+Retgreen=Ret(limits_greenrmin:limits_greenrmax,limits_greencmin:limits_greencmax);
+RetgGreen=mean(Retgreen(:));
+RetgGreenstd=std(Retgreen(:));
+disp(["Retard green Gerard mean",RetgGreen]);
+disp(["Retard green Gerard std",RetgGreenstd]);
+%red
+Retr=Ret(limits_redrmin:limits_redrmax,limits_redcmin:limits_redcmax);
+RetR=mean(Retr(:));
+Retrstd=std(Retr(:));
+disp(["RetardredGerardmean",RetR]);
+disp(["RetardredGerardpstd",Retrstd]);
+
+
+
+
+
+ddeltar=ddelta(limits_redrmin:limits_redrmax,limits_redcmin:limits_redcmax);
+ddeltared=mean(ddeltar(:));
+%=(P(350:380,290:320))./P3(350:380,290:320);
+%disp(["Polarization normalized red",mean(Pred(:))]);
+%disp(["std P norm red",std(Pred(:))]);
+%Pgreen=P(320:330,25:35)./P3(320:330,25:35);
+%disp(["Polarization normalized green",mean(Pgreen(:))]);
+%disp(["std O norm green",std(Pgreen(:))]);
+%contrastP=mean(Pgreen(:))-mean(Pred(:));
+%disp(["contrast P normalized is",contrastP])
+
+%red-green no normalized polarization
+Pred1=P(limits_redrmin:limits_redrmax,limits_redcmin:limits_redcmax);
+disp(["Polarization red",mean(Pred1(:))]);
+disp(["std P red",std(Pred1(:))]);
+
+ddeltag=ddelta(limits_greenrmin:limits_greenrmax,limits_greencmin:limits_greencmax);
+ddeltagreen=mean(ddeltag(:));
+Pgreen1=P(limits_greenrmin:limits_greenrmax,limits_greencmin:limits_greencmax);
+disp(["Polarization green",mean(Pgreen1(:))]);
+disp(["std P green",std(Pgreen1(:))]);
+%contrastP1=mean(Pgreen1(:))-mean(Pred1(:));
+%disp(["contrast P is",contrastP1])
+%red-green DEp.index
+PDred=PD(limits_redrmin:limits_redrmax,limits_redcmin:limits_redcmax);
+PDg=PD(limits_greenrmin:limits_greenrmax,limits_greencmin:limits_greencmax);
+disp(["PD red",mean(PDred(:))]);
+disp([" std PD red",std(PDred(:))]);
+
+disp(["PD green",mean(PDg(:))]);
+disp(["std PD green",std(PDg(:))]);
+
+%mapa P no normalitzada
+figure;
+
+imagesc(P);
+%hold on;
+   %rectangle('Position', [limits_redcmin, limits_redrmin, limits_redcmax - limits_redcmin + 1, limits_redrmax - limits_redrmin + 1], ...
+   % 'EdgeColor', 'r', 'LineWidth', 2);
+    %rectangle('Position', [limits_greencmin, limits_greenrmin, limits_greencmax - limits_greencmin + 1, limits_greenrmax - limits_greenrmin + 1], ...
+    %'EdgeColor', 'green', 'LineWidth', 2);
+colorbar;
+title("P map no normalized");
+clim([0 1]);
+
+
+%disp(["Diattenuation  red",mean(Dred(:))]);
+%disp([" std D norm red",std(Dred(:))]);
+
+%disp(["Diattenuation  green",mean(Dgreen(:))]);
+%disp(["std D normalized green",std(Dgreen(:))]);
+%contrastD=mean(Dgreen(:))-mean(Dred(:));
+%disp(["contrast D normalized is",contrastD])
+
+
+%red-green D no normalized
+Dred1=D(limits_redrmin:limits_redrmax,limits_redcmin:limits_redcmax);
+disp(["Diattenuation red",mean(Dred1(:))]);
+disp(["std D red",std(Dred1(:))]);
+Dgreen1=D(limits_greenrmin:limits_greenrmax,limits_greencmin:limits_greencmax);
+disp(["Diattenuation green",mean(Dgreen1(:))]);
+disp(["std D green",std(Dgreen1(:))]);
+%contrastD1=mean(Dgreen1(:))-mean(Dred1(:));
+%disp(["contrast D is",contrastD1])
+%disp(["ddeltar",ddeltared]);
+%disp(["ddeltar std",std(ddeltar)]);
+%disp(["ddeltag",ddeltagreen]);
+%disp(["ddeltag std",std(ddeltag)]);
+
+
+
+%mapa D no normalitzada
+figure;
+
+imagesc(D);
+%hold on;
+   %rectangle('Position', [limits_redcmin, limits_redrmin, limits_redcmax - limits_redcmin + 1, limits_redrmax - limits_redrmin + 1], ...
+   % 'EdgeColor', 'r', 'LineWidth', 2);
+    %rectangle('Position', [limits_greencmin, limits_greenrmin, limits_greencmax - limits_greencmin + 1, limits_greenrmax - limits_greenrmin + 1], ...
+    %'EdgeColor', 'green', 'LineWidth', 2);
+colorbar;
+clim([0 1])
+title("D map no normalized");
+
+%mapa retard amb zones marcades
+figure;
+imagesc(Ret);
+colorbar;
+%{hold on;
+    rectangle('Position', [limits_redcmin, limits_redrmin, limits_redcmax - limits_redcmin + 1, limits_redrmax - limits_redrmin + 1], ...
+    'EdgeColor', 'r', 'LineWidth', 2);
+    rectangle('Position', [limits_greencmin, limits_greenrmin, limits_greencmax - limits_greencmin + 1, limits_greenrmax - limits_greenrmin + 1], ...
+    'EdgeColor', 'green', 'LineWidth', 2);
+hold off;
+contrastretgerard=(RetR-RetgGreen)/(max(Ret(:))-min(Ret(:)));
+%disp(["contrast amb formula gerard",contrastretgerard]);%}
+%disp(["Pdelta",mean(PD(:))]);
+%disp(["std Pdelta",std(PD(:))]);
+%disp(["D/P3 mean all",mean(B(:))]);
+%disp(["P/P3 mean all",mean(A(:))]);
+disp(["D mean ",mean(D(:))]);
+disp(["D std ",std(D(:))]);
+disp(["Pdelta",mean(PD(:))]);
+disp(["Pdelta std",std(PD(:))]);
+disp(["P mean",mean(P(:))]);
+disp(["P std",std(P(:))]);
+disp(["deltad",mean(ddelta(:))]);
+disp(["deltad std",std(ddelta(:))]);
+disp(["mediana PD",median(PD(:))]);
+
+%Save matrices created for P3,P2,P1
+%fileName4 = 'PD_IR_huellaivan.mat';
+%fileName5="P_IR_huellaivan.mat";
+%fileName6="D_IR_huellaivan.mat";
+%fileName7="ddelta_IR_manoivan.mat";
+%fileName8="RetGil_IR_manoivan.mat";
+
+%desktopPath = fullfile(getenv('USERPROFILE'), 'Desktop', 'comparativazonasivan');  
+% Ruta completa al archivo
+%filePath4 = fullfile(desktopPath, fileName4);
+%filePath5 = fullfile(desktopPath, fileName5);
+%filePath6 = fullfile(desktopPath, fileName6);
+%filePath7 = fullfile(desktopPath, fileName7);
+%filePath8 = fullfile(desktopPath, fileName8);
+
+% Guardar la matriz A en el archivo .mat
+save(filePath4, 'PD');
+save(filePath5, 'P');
+save(filePath6, 'D');
+%save(filePath7, 'ddelta');
+%save(filePath8, 'Ret');
