@@ -1,0 +1,320 @@
+%CARGA ARXIUS PRIMERA PERSONA;arxius del 1 al 4
+rutaArchivo1 = fullfile(getenv('USERPROFILE'), 'Desktop',"matrices", 'PD_470_Juan.mat');
+carga1=load(rutaArchivo1);
+nombreCampos1=fieldnames(carga1);
+
+data1 = carga1.(nombreCampos1{1});
+data1=data1(:);
+
+
+
+rutaArchivo2= fullfile(getenv('USERPROFILE'), 'Desktop',"matrices", 'PD_530_Juan.mat');
+carga2=load(rutaArchivo2);
+nombreCampos2=fieldnames(carga2);
+
+data2 = carga2.(nombreCampos2{1});
+data2=data2(:);
+
+
+rutaArchivo3 = fullfile(getenv('USERPROFILE'), 'Desktop',"matrices", 'PD_625_Juan.mat');
+carga3=load(rutaArchivo3);
+nombreCampos3=fieldnames(carga3);
+ 
+data3 = carga3.(nombreCampos3{1});
+data3=data3(:);
+
+
+rutaArchivo4 = fullfile(getenv('USERPROFILE'), 'Desktop',"matrices", 'PD_IR_Juan.mat');
+carga4=load(rutaArchivo4);
+nombreCampos4=fieldnames(carga4);
+
+data4 = carga4.(nombreCampos4{1});
+data4=data4(:);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%CARGA ARXIUS SEGONA PERSONA; ARXIUS DEL 5 AL 8
+rutaArchivo5 = fullfile(getenv('USERPROFILE'), 'Desktop',"matrices", 'PD_470_Ivan.mat');
+carga5=load(rutaArchivo5);
+nombreCampos5=fieldnames(carga5);
+% Cargar el archivo .mat
+data5 = carga5.(nombreCampos5{1});
+data5=data5(:);
+
+
+rutaArchivo6 = fullfile(getenv('USERPROFILE'), 'Desktop',"matrices", 'PD_530_Ivan.mat');
+carga6=load(rutaArchivo6);
+nombreCampos6=fieldnames(carga6);
+% Cargar el archivo .mat
+data6 = carga6.(nombreCampos6{1});
+data6=data6(:);
+
+
+rutaArchivo7 = fullfile(getenv('USERPROFILE'), 'Desktop',"matrices", 'PD_625_Ivan.mat');
+carga7=load(rutaArchivo7);
+nombreCampos7=fieldnames(carga7);
+% Cargar el archivo .mat
+data7 = carga7.(nombreCampos7{1});
+data7=data7(:);
+
+
+rutaArchivo8 = fullfile(getenv('USERPROFILE'), 'Desktop',"matrices", 'PD_IR_Ivan.mat');
+carga8=load(rutaArchivo8);
+nombreCampos8=fieldnames(carga8);
+% Cargar el archivo .mat
+data8 = carga8.(nombreCampos8{1});
+data8=data8(:);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%CARGA ARXIUS TERCERA PERSONA;ARXIUS DEL 9 AL 12
+rutaArchivo9 = fullfile(getenv('USERPROFILE'), 'Desktop',"matrices", 'PD_470_Pol.mat');
+carga9=load(rutaArchivo9);
+nombreCampos9=fieldnames(carga9);
+% Cargar el archivo .mat
+data9 = carga9.(nombreCampos9{1});
+data9=data9(:);
+
+
+rutaArchivo10 = fullfile(getenv('USERPROFILE'), 'Desktop',"matrices", 'PD_530_Pol.mat');
+carga10=load(rutaArchivo10);
+nombreCampos10=fieldnames(carga10);
+% Cargar el archivo .mat
+data10 = carga10.(nombreCampos10{1});
+data10=data10(:);
+
+
+rutaArchivo11 = fullfile(getenv('USERPROFILE'), 'Desktop',"matrices", 'PD_625_Pol.mat');
+carga11=load(rutaArchivo11);
+nombreCampos11=fieldnames(carga11);
+% Cargar el archivo .mat
+data11 = carga11.(nombreCampos11{1});
+data11=data11(:);
+
+
+rutaArchivo12 = fullfile(getenv('USERPROFILE'), 'Desktop',"matrices", 'PD_IR_Pol.mat');
+carga12=load(rutaArchivo12);
+nombreCampos12=fieldnames(carga12);
+% Cargar el archivo .mat
+data12 = carga12.(nombreCampos12{1});
+data12=data12(:);
+
+
+
+%%%%%%%DIFERENCIA MITJES I MITJANES ENTRE PERSONES
+mean1=mean(data1, 'omitnan');
+mean2=mean(data1, 'omitnan');
+mean3=mean(data1, 'omitnan');
+mean4=mean(data1, 'omitnan');
+mean5=mean(data5, 'omitnan');
+mean6=mean(data6, 'omitnan');
+mean7=mean(data7, 'omitnan');
+mean8=mean(data8, 'omitnan');
+mean9=mean(data9, 'omitnan');
+mean10=mean(data10, 'omitnan');
+mean11=mean(data11, 'omitnan');
+mean12=mean(data12, 'omitnan');
+
+
+
+
+
+median_value1=median(data1);
+median_value2=median(data2);
+median_value3=median(data3);
+median_value4=median(data4);
+median_value5=median(data5);
+median_value6=median(data6);
+median_value7=median(data7);
+median_value8=median(data8);
+median_value9=median(data9);
+median_value10=median(data10);
+median_value11=median(data11);
+median_value12=median(data12);
+
+
+
+
+num_bins = 300;
+
+%%%%%%%%%%%%%%%%%%%%%%% Crear HISTOGRAMA PERSONA1
+figure;
+
+
+histogram(data1, num_bins, 'FaceAlpha', 0.5, 'FaceColor', 'b'); % Histograma 1
+xline(mean1, 'b', 'LineWidth', 2);  % Línea roja con ancho de 2
+xline(median_value1, '--b', 'LineWidth', 2);  % Línea roja con ancho de 2
+hold on;
+histogram(data2, num_bins, 'FaceAlpha', 0.5, 'FaceColor', 'g'); % Histograma 2
+xline(mean2, 'g', 'LineWidth', 2);  % Línea roja con ancho de 2
+xline(median_value2, '--g', 'LineWidth', 2);  % Línea roja con ancho de 2
+histogram(data3, num_bins, 'FaceAlpha', 0.5, 'FaceColor', 'r'); % Histograma 2
+xline(mean3, 'r', 'LineWidth', 2);  % Línea roja con ancho de 2
+xline(median_value3, '--r', 'LineWidth', 2);  % Línea roja con ancho de 2
+histogram(data4, num_bins, 'FaceAlpha', 0.5, 'FaceColor', 'magenta'); % Histograma 2
+xline(mean4, 'magenta', 'LineWidth', 2);  % Línea roja con ancho de 2
+xline(median_value4, "--magenta", 'LineWidth', 2);  % Línea roja con ancho de 2
+
+
+% Personalizar el gráfico
+title('Histogram values P{\Delta}(\lambda) H1');
+xlabel('Value');
+xlim([0 1]);
+ylabel('Frequency');
+legend('\lambda=470',"mean","median", '\lambda=554',"mean","median", '\lambda=630',"mean","median",'\lambda=730',"mean","median");
+hold off;
+
+
+%%%%%%%%%%%%%%%%%%Crear HISTOGRAMA PERSONA2
+figure;
+
+% Graficar el primer histograma
+histogram(data5, num_bins, 'FaceAlpha', 0.5, 'FaceColor', 'b'); % Histograma 1
+xline(mean5, 'b', 'LineWidth', 2);  % Línea roja con ancho de 2
+xline(median_value5, '--b', 'LineWidth', 2);  % Línea roja con ancho de 2
+hold on;
+histogram(data6, num_bins, 'FaceAlpha', 0.5, 'FaceColor', 'g'); % Histograma 2
+xline(mean6, 'g', 'LineWidth', 2);  % Línea roja con ancho de 2
+xline(median_value6, '--g', 'LineWidth', 2);  % Línea roja con ancho de 2
+histogram(data7, num_bins, 'FaceAlpha', 0.5, 'FaceColor', 'r'); % Histograma 2
+xline(mean7, 'r', 'LineWidth', 2);  % Línea roja con ancho de 2
+xline(median_value7, '--r', 'LineWidth', 2);  % Línea roja con ancho de 2
+color = '#8A2BE2';
+histogram(data8, num_bins, 'FaceAlpha', 0.5, 'FaceColor', 'magenta'); % Histograma 2
+xline(mean8, 'magenta', 'LineWidth', 2);  % Línea roja con ancho de 2
+xline(median_value8, "--magenta", 'LineWidth', 2);  % Línea roja con ancho de 2
+
+
+% Personalizar el gráfico
+title('Histogram values P{\Delta}(\lambda) H2');
+xlabel('Valor');
+xlim([0 1]);
+ylabel('Frecuencia');
+legend('\lambda=470',"mean","median", '\lambda=554',"mean","median", '\lambda=630',"mean","median",'\lambda=730',"mean","median");
+hold off;
+
+%%%%%%%%%%%%%%%%%%Crear HISTOGRAMA PERSONA3
+figure;
+
+% Graficar el primer histograma
+histogram(data9, num_bins, 'FaceAlpha', 0.5, 'FaceColor', 'b'); % Histograma 1
+xline(mean9, 'b', 'LineWidth', 2);  % Línea roja con ancho de 2
+xline(median_value9, '--b', 'LineWidth', 2);  % Línea roja con ancho de 2
+hold on;
+histogram(data10, num_bins, 'FaceAlpha', 0.5, 'FaceColor', 'g'); % Histograma 2
+xline(mean10, 'g', 'LineWidth', 2);  % Línea roja con ancho de 2
+xline(median_value10, '--g', 'LineWidth', 2);  % Línea roja con ancho de 2
+histogram(data10, num_bins, 'FaceAlpha', 0.5, 'FaceColor', 'r'); % Histograma 2
+xline(mean11, 'r', 'LineWidth', 2);  % Línea roja con ancho de 2
+xline(median_value11, '--r', 'LineWidth', 2);  % Línea roja con ancho de 2
+histogram(data12, num_bins, 'FaceAlpha', 0.5, 'FaceColor', 'magenta'); % Histograma 2
+xline(mean12, 'magenta', 'LineWidth', 2);  % Línea roja con ancho de 2
+xline(median_value12, "--magenta", 'LineWidth', 2);  % Línea roja con ancho de 2
+
+
+% Personalizar el gráfico
+title('Histogram values P{\Delta}(\lambda) H3');
+xlabel('Valor');
+xlim([0 1]);
+ylabel('Frecuencia');
+legend('\lambda=470',"mean","median", '\lambda=554',"mean","median", '\lambda=630',"mean","median",'\lambda=730',"mean","median");
+hold off;
+
+%error de mediana amb IQR
+Q1_1 = quantile(data1, 0.25);
+Q3_1 = quantile(data1, 0.75);
+IQR_1 = Q3_1 - Q1_1;
+
+Q1_2 = quantile(data2, 0.25);
+Q3_2 = quantile(data2, 0.75);
+IQR_2 = Q3_2 - Q1_2;
+
+Q1_3 = quantile(data3, 0.25);
+Q3_3 = quantile(data3, 0.75);
+IQR_3 = Q3_3 - Q1_3;
+
+Q1_4 = quantile(data4, 0.25);
+Q3_4 = quantile(data4, 0.75);
+IQR_4 = Q3_4 - Q1_4;
+
+Q1_5 = quantile(data5, 0.25);
+Q3_5 = quantile(data5, 0.75);
+IQR_5 = Q3_5 - Q1_5;
+
+Q1_6 = quantile(data6, 0.25);
+Q3_6 = quantile(data6, 0.75);
+IQR_6 = Q3_6 - Q1_6;
+
+Q1_7 = quantile(data7, 0.25);
+Q3_7 = quantile(data7, 0.75);
+IQR_7 = Q3_7 - Q1_7;
+
+Q1_8 = quantile(data8, 0.25);
+Q3_8 = quantile(data8, 0.75);
+IQR_8 = Q3_8 - Q1_8;
+
+Q1_9 = quantile(data9, 0.25);
+Q3_9 = quantile(data9, 0.75);
+IQR_9 = Q3_9 - Q1_9;
+
+Q1_10 = quantile(data10, 0.25);
+Q3_10 = quantile(data10, 0.75);
+IQR_10 = Q3_10 - Q1_10;
+
+Q1_11 = quantile(data11, 0.25);
+Q3_11 = quantile(data11, 0.75);
+IQR_11 = Q3_11 - Q1_11;
+
+Q1_12 = quantile(data12, 0.25);
+Q3_12 = quantile(data12, 0.75);
+IQR_12 = Q3_12 - Q1_12;
+
+
+
+
+% Calcular el error estimado de la diferencia de medianas
+
+error1 = IQR_1;
+error2 = IQR_2;
+error3 = IQR_3;
+error4 = IQR_4;
+error5 = IQR_5;
+error6 = IQR_6;
+error7 = IQR_7;
+error8 = IQR_8;
+error9 = IQR_9;
+error10 = IQR_10;
+error11 = IQR_11;
+error12 = IQR_12;
+
+
+
+
+
+%
+x=[470,554,630,730];
+y = [0.16, median_value2, median_value3, median_value4];
+y2= [median_value5,0.16 , median_value7, median_value8];
+y3=[median_value9, 0.14, median_value11, median_value12];
+e = [error1, error2, error3, error4];
+e2= [error5, error6, error7, error8];
+e3=[error9, error10, error11, error12];
+figure;
+h1=errorbar(x(1), 0.16, e(1), "o", 'Color'," black" , 'LineWidth', 1, 'MarkerSize', 8,'Color', 'black', 'MarkerFaceColor', 'b');
+hold on;
+errorbar(x(2), y(2), e(2),  "o", 'Color'," black" , 'LineWidth', 1, 'MarkerSize', 8,'Color', 'black', 'MarkerFaceColor', 'g');  % Solo barras de error en Y
+errorbar(x(3), y(3), e(3),  "o", 'Color'," black" , 'LineWidth', 1, 'MarkerSize', 8,'Color', 'black', 'MarkerFaceColor', 'r');  % Solo barras de error en Y
+errorbar(x(4), y(4), e(4), 'o', 'Color'," black" , 'LineWidth', 1, 'MarkerSize', 8,'Color', 'black', 'MarkerFaceColor', 'magenta');  % Solo barras de error en Y
+plot(x, y, '--k', 'LineWidth', 1);
+h2=errorbar(x(1), y2(1), e2(1), '^','Color'," r" , 'LineWidth', 0.5, 'MarkerSize', 8, 'Color', 'black', 'MarkerFaceColor', 'b');  % Solo barras de error en Y
+errorbar(x(2), 0.16, e2(2), '^', 'LineWidth', 0.5, 'MarkerSize', 8, 'Color', 'black', 'MarkerFaceColor', 'g');  % Solo barras de error en Y
+errorbar(x(3), y2(3), e2(3), '^', 'LineWidth', 0.5, 'MarkerSize', 8, 'Color', 'black', 'MarkerFaceColor', 'r');  % Solo barras de error en Y
+errorbar(x(4), y2(4), e2(4), '^', 'LineWidth', 0.5, 'MarkerSize', 8, 'Color', 'black', 'MarkerFaceColor', 'magenta');  % Solo barras de error en Y
+plot(x, y2, ':k', 'LineWidth', 1);
+h3=errorbar(x(1), y3(1), e3(1), 'd', 'LineWidth', 0.5, 'MarkerSize', 8, 'Color', 'black', 'MarkerFaceColor', 'b');  % Solo barras de error en Y
+errorbar(x(2), 0.14, e3(2), 'd', 'LineWidth', 0.5, 'MarkerSize', 8, 'Color', 'black', 'MarkerFaceColor', 'g');  % Solo barras de error en Y
+errorbar(x(3), y3(3), e3(3), 'd', 'LineWidth', 0.5, 'MarkerSize', 8, 'Color', 'black', 'MarkerFaceColor', 'r');  % Solo barras de error en Y
+errorbar(x(4), y3(4), e3(4), 'd', 'LineWidth', 0.5, 'MarkerSize', 8, 'Color', 'black', 'MarkerFaceColor', 'magenta');  % Solo barras de error en Y
+plot(x, y3, '-.k', 'LineWidth', 1);
+
+title('P{3}(\lambda)');
+xlabel('\lambda(nm)');
+legend([h1,h2,h3],"H1-hand","H2-hand","H3-hand");
+ylabel('P{3}');
+grid off;
+hold off;
