@@ -1,0 +1,296 @@
+limits_greenrmin=420;% limits green row min
+limits_greenrmax=450;%limits green row max   (rowmin:rowmax,columnmin:columnmax)
+limits_greencmin=80;
+limits_greencmax=100;
+limits_redrmin=50;
+limits_redrmax=80;
+limits_redcmin=80;
+limits_redcmax=100;
+
+
+P1=zeros(512,512);
+P2=zeros(512,512);
+P3=zeros(512,512);
+P3alts=[];
+llistai=[];
+llistaj=[];
+%llistes comparacio zones diferents
+P3red=[];
+P3green=[];
+u=[];
+for a=1:1:512
+    for j=1:1:512
+        
+MI(a,j)=M00(a,j);
+M00(a,j)=M00(a,j)./MI(a,j);
+M01(a,j)=M01(a,j)./MI(a,j);
+M02(a,j)=M02(a,j)./MI(a,j);
+M03(a,j)=M03(a,j)./MI(a,j);
+M10(a,j)=M10(a,j)./MI(a,j);
+M11(a,j)=M11(a,j)./MI(a,j);
+M12(a,j)=M12(a,j)./MI(a,j);
+M13(a,j)=M13(a,j)./MI(a,j);
+M20(a,j)=M20(a,j)./MI(a,j);
+M21(a,j)=M21(a,j)./MI(a,j);
+M22(a,j)=M22(a,j)./MI(a,j);
+M23(a,j)=M23(a,j)./MI(a,j);
+M30(a,j)=M30(a,j)./MI(a,j);
+M31(a,j)=M31(a,j)./MI(a,j);
+M32(a,j)=M32(a,j)./MI(a,j);
+M33(a,j)=M33(a,j)./MI(a,j);
+
+%depolarization index
+s =(M00(a,j)^2)+(M01(a,j)^2)+(M02(a,j)^2)+(M03(a,j)^2)+(M10(a,j)^2)+(M11(a,j)^2)+(M12(a,j)^2)+(M13(a,j)^2)+(M20(a,j)^2)+(M21(a,j)^2)+(M22(a,j)^2)+(M23(a,j)^2)+(M30(a,j)^2)+(M31(a,j)^2)+(M32(a,j)^2)+(M33(a,j)^2);
+PD(a,j)=real(sqrt((((s))-(1))/(3)));
+
+i=sqrt(-1);
+H=0.25*[M00(a,j)+M01(a,j)+M10(a,j)+M11(a,j) M02(a,j)+M12(a,j)+i*(M03(a,j)+M13(a,j)) M20(a,j)+M21(a,j)-i*(M30(a,j)+ M31(a,j)) M22(a,j)+M33(a,j)+i*(M23(a,j)-M32(a,j)); M02(a,j)+M12(a,j)-i*(M03(a,j)+M13(a,j)) M00(a,j)-M01(a,j)+M10(a,j)-M11(a,j) M22(a,j)-M33(a,j)-i*(M23(a,j)+M32(a,j)) M20(a,j)-M21(a,j)-i*(M30(a,j)-M31(a,j)); M20(a,j)+M21(a,j)+i*(M30(a,j)+M31(a,j)) M22(a,j)-M33(a,j)+i*(M23(a,j)+M32(a,j)) M00(a,j)+M01(a,j)-M10(a,j)-M11(a,j) M02(a,j)-M12(a,j)+i*(M03(a,j)-M13(a,j));M22(a,j)+M33(a,j)-i*(M23(a,j)-M32(a,j)) M20(a,j)-M21(a,j)+i*(M30(a,j)-M31(a,j)) M02(a,j)-M12(a,j)+i*(M03(a,j)-M13(a,j)) M00(a,j)-M01(a,j)-M10(a,j)+M11(a,j)];
+
+lambda=eig(H);
+for t=1:length(lambda)
+    if lambda(t)<0
+        u{end+1}=1;
+        for t=1:length(lambda)
+            lambda(t)=0;
+        end
+    end
+end
+
+eigord=sort(lambda,"descend");
+
+tr=trace(H);
+P3(a,j)=real(eigord(1)+eigord(2)+eigord(3)-3*eigord(4))/tr;
+P1ind(a,j)=(real(eigord(1)-eigord(2))/tr);
+P2ind(a,j)=(real(eigord(1)+eigord(2)-2*eigord(3))/tr);
+
+
+
+    end
+end
+
+
+%%%seleccio rectangles interes
+%rectangle vermell
+P3red=P3(limits_redrmin:limits_redrmax,limits_redcmin:limits_redcmax);
+P2red=P2ind(limits_redrmin:limits_redrmax,limits_redcmin:limits_redcmax);
+P1red=P1ind(limits_redrmin:limits_redrmax,limits_redcmin:limits_redcmax);
+
+
+
+%P1red
+P1rmean=mean(P1red(:));
+P1rstd=std(P1red(:));
+
+disp(["P1red is",P1rmean]);
+disp(["P1red std",P1rstd]);
+
+%P2red
+P2rmean=mean(P2red(:));
+P2rstd=std(P2red(:));
+
+
+disp(["P2red is",P2rmean]);
+disp(["P2red std",P2rstd]);
+
+
+%P3red
+P3rmean=mean(P3red(:));           
+P3rstd=std(P3red(:));
+
+disp(["P3red is",P3rmean]);
+disp(["P3red std",P3rstd]);
+
+
+
+%rectangle green
+P3g=P3(limits_greenrmin:limits_greenrmax,limits_greencmin:limits_greencmax);%31x41elements
+P1g=P1ind(limits_greenrmin:limits_greenrmax,limits_greencmin:limits_greencmax);
+P2g=P2ind(limits_greenrmin:limits_greenrmax,limits_greencmin:limits_greencmax);
+
+%P1 green
+P1gmean=mean(P1g(:));
+P1gstd=std(P1g(:));
+disp(["P1g is",P1gmean]);
+disp(["P1g std",P1gstd]);
+
+
+%P2 green
+P2gmean=mean(P2g(:));
+P2gstd=std(P2g(:));
+disp(["P2g is",P2gmean]);
+disp(["P2g std",P2gstd]);
+
+%P3 green
+P3gmean=mean(P3g(:));
+P3gstd=std(P3g(:));
+disp(["P3g is",P3gmean]);
+disp(["P3g std",P3gstd]);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%plots
+
+figure(77);
+imagesc(P1ind);
+title("P1")
+hold on;
+    rectangle('Position', [limits_redcmin, limits_redrmin, limits_redcmax - limits_redcmin + 1, limits_redrmax - limits_redrmin + 1], ...
+    'EdgeColor', 'r', 'LineWidth', 2);
+    rectangle('Position', [limits_greencmin, limits_greenrmin, limits_greencmax - limits_greencmin + 1, limits_greenrmax - limits_greenrmin + 1], ...
+    'EdgeColor', 'green', 'LineWidth', 2);
+colorbar;
+figure;
+imagesc(P2ind);
+title("P2")
+hold on;
+    rectangle('Position', [limits_redcmin, limits_redrmin, limits_redcmax - limits_redcmin + 1, limits_redrmax - limits_redrmin + 1], ...
+    'EdgeColor', 'r', 'LineWidth', 2);
+    rectangle('Position', [limits_greencmin, limits_greenrmin, limits_greencmax - limits_greencmin + 1, limits_greenrmax - limits_greenrmin + 1], ...
+    'EdgeColor', 'green', 'LineWidth', 2);
+colorbar;
+figure;
+imagesc(P3);
+hold on;
+    rectangle('Position', [limits_redcmin, limits_redrmin, limits_redcmax - limits_redcmin + 1, limits_redrmax - limits_redrmin + 1], ...
+    'EdgeColor', 'r', 'LineWidth', 2);
+    rectangle('Position', [limits_greencmin, limits_greenrmin, limits_greencmax - limits_greencmin + 1, limits_greenrmax - limits_greenrmin + 1], ...
+    'EdgeColor', 'green', 'LineWidth', 2);
+title("P3")
+colorbar;
+
+%frafic IPPs normal
+figure;
+V = [0 0 0;   % Vertex 1
+     0 0 1;  % Vertex 2
+     0 1 1;  % Vertex 3
+     1 1 1];  % Vertex 4
+
+
+F = [1 2 3;    % Cara 1
+     1 2 4;    % Cara 2
+     1 3 4;    % Cara 3
+     2 3 4];   % Cara 4
+
+% Dibujar el tetraedro
+
+patch('Vertices', V, 'Faces', F, 'FaceColor', 'no', 'FaceAlpha', 0.6);
+hold on;
+plot3(P1ind, P2ind, P3, 'ro', 'MarkerFaceColor', 'r'); % puntos rojos
+axis equal;
+xlabel('P1');
+ylabel('P2');
+zlabel('P3');
+title('IPPs space with P1&P2 no normalized/P3');
+
+hold off;
+
+% Opcional: mejorar la visualización
+grid on;
+rotate3d on;
+hold off;
+
+%%%%parametres P3
+muP3 = mean(P3(:));           % Media
+sigma2P3 = (1/(numel(P3)))*sum((P3(:) - muP3).^2);
+sigmaP3=sqrt(sigma2P3);
+disp(['P3 all sample is: ', num2str(muP3)]);
+disp(['stdP3 all sample is: ', num2str(sigmaP3)]);
+
+%%%%parametres P2
+muP2 = mean(P2ind(:));           % Media
+sigma2P2 = (1/(numel(P2ind)))*sum((P2ind(:) - muP2).^2);
+sigmaP2=sqrt(sigma2P2);
+disp(['P2 all sample is: ', num2str(muP2)]);
+disp(['stdP2 all sample is: ', num2str(sigmaP2)]);
+
+%%%%parametres P1
+muP1 = mean(P1ind(:));           % Media
+sigma2P1 = (1/(numel(P1ind)))*sum((P1ind(:) - muP1).^2);
+sigmaP1=sqrt(sigma2P1);
+
+disp(['P1 all sample is: ', num2str(muP1)]);
+disp(['stdP1 all sample is: ', num2str(sigmaP1)]);
+
+
+
+%%%%%%%%%%%%
+
+figure(44);
+imagesc(P3);
+hold on;
+    rectangle('Position', [limits_redcmin, limits_redrmin, limits_redcmax - limits_redcmin + 1, limits_redrmax - limits_redrmin + 1], ...
+    'EdgeColor', 'r', 'LineWidth', 2);
+    rectangle('Position', [limits_greencmin, limits_greenrmin, limits_greencmax - limits_greencmin + 1, limits_greenrmax - limits_greenrmin + 1], ...
+    'EdgeColor', 'green', 'LineWidth', 2);
+title("P3");
+colorbar;
+hold off;
+
+%deltaP3green-red
+%deltaP3=P3gmean-P3rmean;
+%stdP3=sqrt(sigmar^2+sigmag^2);
+%disp(['deltaP3 is: ', num2str(deltaP3)]);
+%disp(['stddeltaP3 is: ', num2str(stdP3)]);
+%disp(P3rmean)
+%disp(sigmar)
+%disp(P3gmean)
+%disp(sigmag)
+%disp(length(u))
+figure;
+V = [0 0 0;   % Vertex 1
+     0 0 1;  % Vertex 2
+     0 1 1;  % Vertex 3
+     1 1 1];  % Vertex 4
+
+% Definir las caras del tetraedro (cuáles Vertexs forman cada cara triangular)
+F = [1 2 3;    % Cara 1
+     1 2 4;    % Cara 2
+     1 3 4;    % Cara 3
+     2 3 4];   % Cara 4
+
+% Dibujar el tetraedro
+
+patch('Vertices', V, 'Faces', F, 'FaceColor', 'no', 'FaceAlpha', 0.6);
+hold on;
+plot3(P1g,P2g,P3g,'go', 'MarkerFaceColor', 'g');
+plot3(P1red,P2red,P3red,'ro', 'MarkerFaceColor', 'r');
+title("IPPs no normalitzat green-red")
+xlabel("P1");
+ylabel("P2");
+zlabel("P3");
+ax = gca;
+
+% Cambiar el grosor de los límites (ejes)
+ax.LineWidth = 1.5; 
+grid on;
+hold off;
+
+disp(["nombre de pixels fisicament no realitzables" ,length(u)]);
+disp(["P1g",P1gmean]);
+disp(["P1 std",P1rstd]);
+disp(["P2g",P2gmean]);
+disp(["P2red std",P2rstd]);
+disp(["P3g",P3gmean]);
+disp(["P3red std",std(P3green(:))]);
+
+colores = cat(3, P1ind, (P2ind-P1ind),1-P3);  % Vermell=P1,verd=P2,blau=P3
+
+% Mostrar la matriz usando imagesc
+figure;
+imshow(colores);
+title("Pseudocolormap")
+
+
+%Save matrices created for P3,P2,P1
+%fileName = 'P3_470_huellaivan.mat';
+%fileName2="P2_470_huellaivan.mat";
+%fileName3="P1_470_huellaivan.mat";
+
+%desktopPath = fullfile(getenv('USERPROFILE'), 'Desktop', 'comparativazonasivan');  
+% Ruta completa al archivo
+%filePath = fullfile(desktopPath, fileName);
+%filePath2 = fullfile(desktopPath, fileName2);
+%filePath3 = fullfile(desktopPath, fileName3);
+
+% Guardar la matriz en el archivo .mat
+save(filePath, 'P3');
+save(filePath2, 'P2ind');
+save(filePath3, 'P1ind');
